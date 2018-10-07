@@ -9,3 +9,4 @@ GoogleService-Info.plist
 
 
 .firebase/
+node_modules/
