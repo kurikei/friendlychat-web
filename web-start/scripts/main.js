@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-'use strict';
+
 
 // Signs-in Friendly Chat.
 function signIn() {
@@ -74,16 +74,16 @@ function requestNotificationsPermissions() {
 // Triggered when a file is selected via the media picker.
 function onMediaFileSelected(event) {
   event.preventDefault();
-  var file = event.target.files[0];
+  const file = event.target.files[0];
 
   // Clear the selection in the file picker input.
   imageFormElement.reset();
 
   // Check if the file is an image.
   if (!file.type.match('image.*')) {
-    var data = {
+    const data = {
       message: 'You can only share images',
-      timeout: 2000
+      timeout: 2000,
     };
     signInSnackbarElement.MaterialSnackbar.showSnackbar(data);
     return;
@@ -99,7 +99,7 @@ function onMessageFormSubmit(e) {
   e.preventDefault();
   // Check that the user entered a message and is signed in.
   if (messageInputElement.value && checkSignedInWithMessage()) {
-    saveMessage(messageInputElement.value).then(function() {
+    saveMessage(messageInputElement.value).then(() => {
       // Clear message text field and re-enable the SEND button.
       resetMaterialTextfield(messageInputElement);
       toggleButton();
@@ -111,11 +111,11 @@ function onMessageFormSubmit(e) {
 function authStateObserver(user) {
   if (user) { // User is signed in!
     // Get the signed-in user's profile pic and name.
-    var profilePicUrl = getProfilePicUrl();
-    var userName = getUserName();
+    const profilePicUrl = getProfilePicUrl();
+    const userName = getUserName();
 
     // Set the user's profile pic and name.
-    userPicElement.style.backgroundImage = 'url(' + profilePicUrl + ')';
+    userPicElement.style.backgroundImage = `url(${profilePicUrl})`;
     userNameElement.textContent = userName;
 
     // Show user's profile and sign-out button.
@@ -147,9 +147,9 @@ function checkSignedInWithMessage() {
   }
 
   // Display a message to the user using a Toast.
-  var data = {
+  const data = {
     message: 'You must sign-in first',
-    timeout: 2000
+    timeout: 2000,
   };
   signInSnackbarElement.MaterialSnackbar.showSnackbar(data);
   return false;
@@ -162,47 +162,46 @@ function resetMaterialTextfield(element) {
 }
 
 // Template for messages.
-var MESSAGE_TEMPLATE =
-    '<div class="message-container">' +
-      '<div class="spacing"><div class="pic"></div></div>' +
-      '<div class="message"></div>' +
-      '<div class="name"></div>' +
-    '</div>';
+const MESSAGE_TEMPLATE = '<div class="message-container">'
+      + '<div class="spacing"><div class="pic"></div></div>'
+      + '<div class="message"></div>'
+      + '<div class="name"></div>'
+    + '</div>';
 
 // A loading image URL.
-var LOADING_IMAGE_URL = 'https://www.google.com/images/spin-32.gif?a';
+const LOADING_IMAGE_URL = 'https://www.google.com/images/spin-32.gif?a';
 
 // Displays a Message in the UI.
 function displayMessage(key, name, text, picUrl, imageUrl) {
-  var div = document.getElementById(key);
+  let div = document.getElementById(key);
   // If an element for that message does not exists yet we create it.
   if (!div) {
-    var container = document.createElement('div');
+    const container = document.createElement('div');
     container.innerHTML = MESSAGE_TEMPLATE;
     div = container.firstChild;
     div.setAttribute('id', key);
     messageListElement.appendChild(div);
   }
   if (picUrl) {
-    div.querySelector('.pic').style.backgroundImage = 'url(' + picUrl + ')';
+    div.querySelector('.pic').style.backgroundImage = `url(${picUrl})`;
   }
   div.querySelector('.name').textContent = name;
-  var messageElement = div.querySelector('.message');
+  const messageElement = div.querySelector('.message');
   if (text) { // If the message is text.
     messageElement.textContent = text;
     // Replace all line breaks by <br>.
     messageElement.innerHTML = messageElement.innerHTML.replace(/\n/g, '<br>');
   } else if (imageUrl) { // If the message is an image.
-    var image = document.createElement('img');
-    image.addEventListener('load', function() {
+    const image = document.createElement('img');
+    image.addEventListener('load', () => {
       messageListElement.scrollTop = messageListElement.scrollHeight;
     });
-    image.src = imageUrl + '&' + new Date().getTime();
+    image.src = `${imageUrl}&${new Date().getTime()}`;
     messageElement.innerHTML = '';
     messageElement.appendChild(image);
   }
   // Show the card fading-in and scroll to view the new message.
-  setTimeout(function() {div.classList.add('visible')}, 1);
+  setTimeout(() => { div.classList.add('visible'); }, 1);
   messageListElement.scrollTop = messageListElement.scrollHeight;
   messageInputElement.focus();
 }
@@ -220,9 +219,9 @@ function toggleButton() {
 // Checks that the Firebase SDK has been correctly setup and configured.
 function checkSetup() {
   if (!window.firebase || !(firebase.app instanceof Function) || !firebase.app().options) {
-    window.alert('You have not configured and imported the Firebase SDK. ' +
-        'Make sure you go through the codelab setup instructions and make ' +
-        'sure you are running the codelab using `firebase serve`');
+    window.alert('You have not configured and imported the Firebase SDK. '
+        + 'Make sure you go through the codelab setup instructions and make '
+        + 'sure you are running the codelab using `firebase serve`');
   }
 }
 
@@ -231,12 +230,12 @@ checkSetup();
 
 // Shortcuts to DOM Elements.
 var messageListElement = document.getElementById('messages');
-var messageFormElement = document.getElementById('message-form');
+const messageFormElement = document.getElementById('message-form');
 var messageInputElement = document.getElementById('message');
 var submitButtonElement = document.getElementById('submit');
-var imageButtonElement = document.getElementById('submitImage');
+const imageButtonElement = document.getElementById('submitImage');
 var imageFormElement = document.getElementById('image-form');
-var mediaCaptureElement = document.getElementById('mediaCapture');
+const mediaCaptureElement = document.getElementById('mediaCapture');
 var userPicElement = document.getElementById('user-pic');
 var userNameElement = document.getElementById('user-name');
 var signInButtonElement = document.getElementById('sign-in');
@@ -253,7 +252,7 @@ messageInputElement.addEventListener('keyup', toggleButton);
 messageInputElement.addEventListener('change', toggleButton);
 
 // Events for image upload.
-imageButtonElement.addEventListener('click', function(e) {
+imageButtonElement.addEventListener('click', (e) => {
   e.preventDefault();
   mediaCaptureElement.click();
 });
