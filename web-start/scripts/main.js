@@ -49,18 +49,45 @@ function isUserSignedIn() {
 
 // Loads chat messages history and listens for upcoming ones.
 function loadMessages() {
-  // TODO 7: Load and listens for new messages.
+  const callback = function (snap) {
+    const data = snap.val();
+    displayMessage(snap.key, data.name, data.text, data.profilePicUrl, data.imageUrl);
+  };
+
+  firebase.database().ref('/messages/').limitToLast(12).on('child_added', callback);
+  firebase.database().ref('/messages/').limitToLast(12).on('child_changed', callback);
 }
 
 // Saves a new message on the Firebase DB.
 function saveMessage(messageText) {
-  // TODO 8: Push a new message to Firebase.
+  return firebase.database().ref('/messages/').push({
+    name: getUserName(),
+    text: messageText,
+    profilePicUrl: getProfilePicUrl(),
+  }).catch((error) => {
+    console.error('Error writing new message to Firebase Database', error);
+  });
 }
 
 // Saves a new message containing an image in Firebase.
 // This first saves the image in Firebase storage.
 function saveImageMessage(file) {
-  // TODO 9: Posts a new image as a message.
+  // 1 - We add a message with a loading icon that will get updated with the shared image.
+  firebase.database().ref('/messages/').push({
+    name: getUserName(),
+    imageUrl: LOADING_IMAGE_URL,
+    profilePicUrl: getProfilePicUrl(),
+  }).then((messageRef) => {
+    // 2 - Upload the image to Cloud Storage.
+    const filePath = `${firebase.auth().currentUser.uid}/${messageRef.key}/${file.name}`;
+    return firebase.storage().ref(filePath).put(file).then(fileSnapshot => fileSnapshot.ref.getDownloadURL().then(url => messageRef.update({
+      imageUrl: url,
+      storageUri: fileSnapshot.metadata.fullPath,
+    })));
+  })
+    .catch((error) => {
+      console.error('There was an error uploading a file to Cloud Storage:', error);
+    });
 }
 
 // Saves the messaging device token to the datastore.
